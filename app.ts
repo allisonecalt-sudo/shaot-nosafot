@@ -120,10 +120,19 @@ const statusLabels: Record<EntryStatus, string> = {
 let currentYear = 2026;
 let currentMonth = 3; // April (0-indexed)
 
+function isExpired(entry: HoursEntry): boolean {
+  if (entry.status !== "tbd") return false;
+  const weeks = NOTICE_WEEKS[entry.location];
+  if (!weeks) return false;
+  const deadline = new Date(entry.date);
+  deadline.setDate(deadline.getDate() - weeks * 7);
+  return new Date() > deadline;
+}
+
 function getEntries(year: number, month: number): HoursEntry[] {
   return entries.filter((e) => {
     const d = new Date(e.date);
-    return d.getFullYear() === year && d.getMonth() === month;
+    return d.getFullYear() === year && d.getMonth() === month && !isExpired(e);
   });
 }
 
