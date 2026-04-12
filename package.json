@@ -7,13 +7,19 @@
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "npx playwright test",
+    "test:ci": "npx playwright test",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
-    "@typescript-eslint/parser": "^7.0.0",
+    "@playwright/test": "^1.59.1",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.57.0",
-    "prettier": "^3.2.0"
+    "husky": "^9.1.7",
+    "prettier": "^3.2.0",
+    "serve": "^14.2.6",
+    "typescript": "^5.4.0"
   }
 }

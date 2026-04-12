@@ -23,6 +23,9 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run build
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - run: npm run test
       - name: Prepare deploy
         run: |
           mkdir -p _site
