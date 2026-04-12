@@ -23,8 +23,41 @@ function getDecideByDate(entry: HoursEntry): string | null {
   return `${d.getDate()}/${d.getMonth() + 1}`;
 }
 
-// ===== DATA — edit here to add/update entries =====
-const entries: HoursEntry[] = [
+// Recurring TBD slots — auto-generated for every Monday and Friday
+const RECURRING_SLOTS: {
+  dayOfWeek: number;
+  time: string;
+  location: string;
+  hours: number;
+}[] = [
+  { dayOfWeek: 1, time: "3:15-7:15", location: "נווה יעקב", hours: 4 }, // Monday
+  { dayOfWeek: 5, time: "8:00-12:00", location: "תלפיות", hours: 4 }, // Friday
+];
+
+function generateTbdEntries(year: number, month: number): HoursEntry[] {
+  const generated: HoursEntry[] = [];
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month, d);
+    const dow = date.getDay();
+    const slot = RECURRING_SLOTS.find((s) => s.dayOfWeek === dow);
+    if (!slot) continue;
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    // Only generate if no manual entry exists for this date
+    if (manualEntries.some((e) => e.date === dateStr)) continue;
+    generated.push({
+      date: dateStr,
+      time: slot.time,
+      location: slot.location,
+      status: "tbd",
+      hours: slot.hours,
+    });
+  }
+  return generated;
+}
+
+// ===== MANUAL DATA — confirmed/requested/done entries override TBD =====
+const manualEntries: HoursEntry[] = [
   // April 2026
   {
     date: "2026-04-10",
@@ -70,35 +103,6 @@ const entries: HoursEntry[] = [
     status: "requested",
     hours: 4,
   },
-  // Neve Yaakov Mondays — TBD, decide by Apr 19
-  {
-    date: "2026-05-04",
-    time: "3:15-7:15",
-    location: "נווה יעקב",
-    status: "tbd",
-    hours: 4,
-  },
-  {
-    date: "2026-05-11",
-    time: "3:15-7:15",
-    location: "נווה יעקב",
-    status: "tbd",
-    hours: 4,
-  },
-  {
-    date: "2026-05-18",
-    time: "3:15-7:15",
-    location: "נווה יעקב",
-    status: "tbd",
-    hours: 4,
-  },
-  {
-    date: "2026-05-25",
-    time: "3:15-7:15",
-    location: "נווה יעקב",
-    status: "tbd",
-    hours: 4,
-  },
 ];
 
 const hebrewMonths: string[] = [
@@ -136,10 +140,14 @@ function isExpired(entry: HoursEntry): boolean {
 }
 
 function getEntries(year: number, month: number): HoursEntry[] {
-  return entries.filter((e) => {
+  const manual = manualEntries.filter((e) => {
     const d = new Date(e.date);
-    return d.getFullYear() === year && d.getMonth() === month && !isExpired(e);
+    return d.getFullYear() === year && d.getMonth() === month;
   });
+  const generated = generateTbdEntries(year, month).filter(
+    (e) => !isExpired(e),
+  );
+  return [...manual, ...generated];
 }
 
 function render(): void {
