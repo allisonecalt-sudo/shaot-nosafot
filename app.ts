@@ -157,19 +157,16 @@ function getDeadlineMarkers(
       checkMonth -= 12;
       checkYear++;
     }
-    const tbdEntries = [
+    const allEntries = [
       ...generateTbdEntries(checkYear, checkMonth),
       ...manualEntries.filter((e) => {
         const d = new Date(e.date);
-        return (
-          d.getFullYear() === checkYear &&
-          d.getMonth() === checkMonth &&
-          (e.status === "tbd" || e.status === "requested")
-        );
+        return d.getFullYear() === checkYear && d.getMonth() === checkMonth;
       }),
     ];
-    for (const entry of tbdEntries) {
-      if (isExpired(entry)) continue;
+    for (const entry of allEntries) {
+      if (entry.status === "tbd" && isExpired(entry)) continue;
+      if (entry.status === "done") continue;
       // Decision reminder goes on the day before the shift
       const reminderDate = new Date(entry.date);
       reminderDate.setDate(reminderDate.getDate() - 1);
@@ -177,7 +174,8 @@ function getDeadlineMarkers(
         reminderDate.getFullYear() === year &&
         reminderDate.getMonth() === month
       ) {
-        if (new Date() > reminderDate) continue;
+        // Hide if the shift itself has passed
+        if (new Date() > new Date(entry.date)) continue;
         const day = reminderDate.getDate();
         if (!markers[day]) markers[day] = [];
         const entryDate = new Date(entry.date);
@@ -276,7 +274,7 @@ function render(): void {
     if (deadlines) {
       inner += `<span class="deadline-dot">⏰</span>`;
       const lines = deadlines
-        .map((dl) => `${dl.forDate} ${dl.location} — להחליט?`)
+        .map((dl) => `מחר: ${dl.forDate} ${dl.location}`)
         .join("<br>");
       if (!entry) {
         inner += `<div class="tooltip">${lines}</div>`;
