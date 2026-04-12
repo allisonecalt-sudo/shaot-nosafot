@@ -180,7 +180,10 @@ function getDeadlineMarkers(
         deadlineDate.getFullYear() === year &&
         deadlineDate.getMonth() === month
       ) {
-        if (new Date() > deadlineDate) continue;
+        // Hide only after the day is completely over (next day)
+        const endOfDay = new Date(deadlineDate);
+        endOfDay.setDate(endOfDay.getDate() + 1);
+        if (new Date() > endOfDay) continue;
         const day = deadlineDate.getDate();
         if (!markers[day]) markers[day] = [];
         const entryDate = new Date(entry.date);
