@@ -22,7 +22,7 @@ const entries: HoursEntry[] = [
   {
     date: "2026-04-17",
     time: "—",
-    location: "—",
+    location: "תלפיות",
     status: "confirmed",
     hours: 4,
   },
