@@ -8,6 +8,21 @@ interface HoursEntry {
   hours: number;
 }
 
+// Notice rules: how many weeks before the date you need to decide
+const NOTICE_WEEKS: Record<string, number> = {
+  תלפיות: 3,
+  "נווה יעקב": 2,
+};
+
+function getDecideByDate(entry: HoursEntry): string | null {
+  const weeks = NOTICE_WEEKS[entry.location];
+  if (!weeks) return null;
+  if (entry.status !== "tbd" && entry.status !== "requested") return null;
+  const d = new Date(entry.date);
+  d.setDate(d.getDate() - weeks * 7);
+  return `${d.getDate()}/${d.getMonth() + 1}`;
+}
+
 // ===== DATA — edit here to add/update entries =====
 const entries: HoursEntry[] = [
   // April 2026
@@ -175,7 +190,9 @@ function render(): void {
     let inner = `<span class="num">${d}</span>`;
     if (entry) {
       inner += `<span class="hours-badge">${entry.hours} שע׳</span>`;
-      inner += `<div class="tooltip">${entry.time} · ${entry.location}</div>`;
+      const decideBy = getDecideByDate(entry);
+      const deadlineText = decideBy ? `<br>להחליט עד ${decideBy}` : "";
+      inner += `<div class="tooltip">${entry.time} · ${entry.location}${deadlineText}</div>`;
     }
     html += `<div class="${cls}">${inner}</div>`;
   }
@@ -191,11 +208,16 @@ function render(): void {
       .forEach((e) => {
         const d = new Date(e.date);
         const dayStr = `${d.getDate()}/${d.getMonth() + 1}`;
+        const decideBy = getDecideByDate(e);
+        const deadlineLine = decideBy
+          ? `<div class="location">להחליט עד ${decideBy}</div>`
+          : "";
         detailsHtml += `
         <div class="detail-card">
           <div class="info">
             <div>${dayStr} · ${e.time}</div>
             <div class="location">${e.location} · ${e.hours} שעות</div>
+            ${deadlineLine}
           </div>
           <span class="status-tag ${e.status}">${statusLabels[e.status]}</span>
         </div>`;
