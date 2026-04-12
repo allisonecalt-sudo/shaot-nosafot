@@ -23,7 +23,7 @@ const NOTICE_DAYS: Record<string, number> = {
 function getDecideByDate(entry: HoursEntry): string | null {
   const days = NOTICE_DAYS[entry.location];
   if (!days) return null;
-  if (entry.status !== "tbd" && entry.status !== "requested") return null;
+  if (entry.status !== "tbd") return null;
   const d = new Date(entry.date);
   d.setDate(d.getDate() - days);
   return `${d.getDate()}/${d.getMonth() + 1}`;
@@ -165,7 +165,7 @@ function getDeadlineMarkers(
         return (
           d.getFullYear() === checkYear &&
           d.getMonth() === checkMonth &&
-          (e.status === "tbd" || e.status === "requested")
+          e.status === "tbd"
         );
       }),
     ];
