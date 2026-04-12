@@ -14,17 +14,18 @@ interface DeadlineMarker {
 }
 
 // Notice rules: how many weeks before the date you need to decide
-const NOTICE_WEEKS: Record<string, number> = {
-  תלפיות: 3,
-  "נווה יעקב (אבישג)": 2,
+// Notice period in days: Talpiot (Merav) = 15 days, Neve Yaakov (Avishag) = 22 days
+const NOTICE_DAYS: Record<string, number> = {
+  תלפיות: 15, // 2 weeks + 1 day
+  "נווה יעקב (אבישג)": 22, // 3 weeks + 1 day
 };
 
 function getDecideByDate(entry: HoursEntry): string | null {
-  const weeks = NOTICE_WEEKS[entry.location];
-  if (!weeks) return null;
+  const days = NOTICE_DAYS[entry.location];
+  if (!days) return null;
   if (entry.status !== "tbd" && entry.status !== "requested") return null;
   const d = new Date(entry.date);
-  d.setDate(d.getDate() - weeks * 7 - 1); // day before
+  d.setDate(d.getDate() - days);
   return `${d.getDate()}/${d.getMonth() + 1}`;
 }
 
@@ -137,10 +138,10 @@ let currentMonth = 3; // April (0-indexed)
 
 function isExpired(entry: HoursEntry): boolean {
   if (entry.status !== "tbd") return false;
-  const weeks = NOTICE_WEEKS[entry.location];
-  if (!weeks) return false;
+  const days = NOTICE_DAYS[entry.location];
+  if (!days) return false;
   const deadline = new Date(entry.date);
-  deadline.setDate(deadline.getDate() - weeks * 7 - 1); // day before
+  deadline.setDate(deadline.getDate() - days);
   return new Date() > deadline;
 }
 
@@ -170,11 +171,11 @@ function getDeadlineMarkers(
     ];
     for (const entry of tbdEntries) {
       if (isExpired(entry)) continue;
-      const weeks = NOTICE_WEEKS[entry.location];
-      if (!weeks) continue;
-      // Yellow marker goes on the notice deadline (2 or 3 weeks before)
+      const days = NOTICE_DAYS[entry.location];
+      if (!days) continue;
+      // Yellow marker on notice deadline (15 or 22 days before)
       const deadlineDate = new Date(entry.date);
-      deadlineDate.setDate(deadlineDate.getDate() - weeks * 7);
+      deadlineDate.setDate(deadlineDate.getDate() - days);
       if (
         deadlineDate.getFullYear() === year &&
         deadlineDate.getMonth() === month
