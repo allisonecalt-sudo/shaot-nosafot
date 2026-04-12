@@ -26,7 +26,7 @@ function getDecideByDate(entry: HoursEntry): string | null {
 // ===== DATA — edit here to add/update entries =====
 const entries: HoursEntry[] = [
   // April 2026
-  { date: "2026-04-10", time: "—", location: "—", status: "done", hours: 4 },
+  { date: "2026-04-10", time: "—", location: "תלפיות", status: "done", hours: 4 },
   {
     date: "2026-04-13",
     time: "3:30pm",
