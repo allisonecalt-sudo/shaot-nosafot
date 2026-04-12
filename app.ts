@@ -16,7 +16,7 @@ interface DeadlineMarker {
 // Notice rules: how many weeks before the date you need to decide
 const NOTICE_WEEKS: Record<string, number> = {
   תלפיות: 3,
-  "נווה יעקב": 2,
+  "נווה יעקב (אבישג)": 2,
 };
 
 function getDecideByDate(entry: HoursEntry): string | null {
@@ -35,7 +35,7 @@ const RECURRING_SLOTS: {
   location: string;
   hours: number;
 }[] = [
-  { dayOfWeek: 1, time: "3:15-7:15", location: "נווה יעקב", hours: 4 }, // Monday
+  { dayOfWeek: 1, time: "3:15-7:15", location: "נווה יעקב (אבישג)", hours: 4 }, // Monday
   { dayOfWeek: 5, time: "8:00-12:00", location: "תלפיות", hours: 4 }, // Friday
 ];
 
