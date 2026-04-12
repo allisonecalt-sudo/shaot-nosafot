@@ -24,7 +24,7 @@ function getDecideByDate(entry: HoursEntry): string | null {
   if (!weeks) return null;
   if (entry.status !== "tbd" && entry.status !== "requested") return null;
   const d = new Date(entry.date);
-  d.setDate(d.getDate() - weeks * 7);
+  d.setDate(d.getDate() - weeks * 7 - 1); // day before
   return `${d.getDate()}/${d.getMonth() + 1}`;
 }
 
@@ -140,7 +140,7 @@ function isExpired(entry: HoursEntry): boolean {
   const weeks = NOTICE_WEEKS[entry.location];
   if (!weeks) return false;
   const deadline = new Date(entry.date);
-  deadline.setDate(deadline.getDate() - weeks * 7);
+  deadline.setDate(deadline.getDate() - weeks * 7 - 1); // day before
   return new Date() > deadline;
 }
 
@@ -174,6 +174,8 @@ function getDeadlineMarkers(
       if (!weeks) continue;
       const deadline = new Date(entry.date);
       deadline.setDate(deadline.getDate() - weeks * 7);
+      // Shift to day before (Thu instead of Fri, Sun instead of Mon)
+      deadline.setDate(deadline.getDate() - 1);
       if (deadline.getFullYear() === year && deadline.getMonth() === month) {
         // Skip if deadline date has already passed
         if (new Date() > deadline) continue;
