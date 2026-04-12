@@ -1,0 +1,242 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  padding: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+.header h1 {
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+}
+.nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+.nav button {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  color: #007aff;
+}
+.nav button:hover {
+  background: #e8e8ed;
+}
+.nav .month-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-width: 140px;
+  text-align: center;
+}
+
+.totals {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.totals .chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.chip.done {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.chip.confirmed {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.chip.requested {
+  background: #fff3e0;
+  color: #e65100;
+}
+.chip.total {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.day-header {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #86868b;
+  padding: 6px 0;
+}
+.day {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  background: #fff;
+  position: relative;
+  min-height: 48px;
+}
+.day.empty {
+  background: transparent;
+}
+.day.today {
+  border: 2px solid #007aff;
+}
+.day .num {
+  font-weight: 600;
+}
+.day .hours-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  margin-top: 2px;
+}
+.day.status-done {
+  background: #e8f5e9;
+}
+.day.status-done .hours-badge {
+  background: #2e7d32;
+  color: #fff;
+}
+.day.status-confirmed {
+  background: #e3f2fd;
+}
+.day.status-confirmed .hours-badge {
+  background: #1565c0;
+  color: #fff;
+}
+.day.status-requested {
+  background: #fff3e0;
+}
+.day.status-requested .hours-badge {
+  background: #e65100;
+  color: #fff;
+}
+.day.status-tbd {
+  background: #fce4ec;
+}
+.day.status-tbd .hours-badge {
+  background: #ad1457;
+  color: #fff;
+}
+
+.day .tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  background: #1d1d1f;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  z-index: 10;
+  text-align: center;
+}
+.day:hover .tooltip,
+.day:active .tooltip {
+  display: block;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #86868b;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.legend-dot.done {
+  background: #2e7d32;
+}
+.legend-dot.confirmed {
+  background: #1565c0;
+}
+.legend-dot.requested {
+  background: #e65100;
+}
+.legend-dot.tbd {
+  background: #ad1457;
+}
+
+.details {
+  margin-top: 20px;
+}
+.details h3 {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  color: #86868b;
+}
+.detail-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.detail-card .info {
+  font-size: 0.85rem;
+}
+.detail-card .info .location {
+  color: #86868b;
+  font-size: 0.75rem;
+}
+.detail-card .status-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+.status-tag.done {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.status-tag.confirmed {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.status-tag.requested {
+  background: #fff3e0;
+  color: #e65100;
+}
+.status-tag.tbd {
+  background: #fce4ec;
+  color: #ad1457;
+}
