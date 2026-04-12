@@ -170,16 +170,15 @@ function getDeadlineMarkers(
     ];
     for (const entry of tbdEntries) {
       if (isExpired(entry)) continue;
-      const weeks = NOTICE_WEEKS[entry.location];
-      if (!weeks) continue;
-      const deadline = new Date(entry.date);
-      deadline.setDate(deadline.getDate() - weeks * 7);
-      // Shift to day before (Thu instead of Fri, Sun instead of Mon)
-      deadline.setDate(deadline.getDate() - 1);
-      if (deadline.getFullYear() === year && deadline.getMonth() === month) {
-        // Skip if deadline date has already passed
-        if (new Date() > deadline) continue;
-        const day = deadline.getDate();
+      // Decision reminder goes on the day before the shift
+      const reminderDate = new Date(entry.date);
+      reminderDate.setDate(reminderDate.getDate() - 1);
+      if (
+        reminderDate.getFullYear() === year &&
+        reminderDate.getMonth() === month
+      ) {
+        if (new Date() > reminderDate) continue;
+        const day = reminderDate.getDate();
         if (!markers[day]) markers[day] = [];
         const entryDate = new Date(entry.date);
         markers[day].push({
@@ -277,7 +276,7 @@ function render(): void {
     if (deadlines) {
       inner += `<span class="deadline-dot">⏰</span>`;
       const lines = deadlines
-        .map((dl) => `להחליט על ${dl.forDate} ${dl.location}`)
+        .map((dl) => `${dl.forDate} ${dl.location} — להחליט?`)
         .join("<br>");
       if (!entry) {
         inner += `<div class="tooltip">${lines}</div>`;
