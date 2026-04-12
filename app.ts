@@ -149,34 +149,38 @@ function getDeadlineMarkers(
   month: number,
 ): Record<number, DeadlineMarker[]> {
   const markers: Record<number, DeadlineMarker[]> = {};
-  // Check TBD entries from nearby months (current + next 2 months)
-  for (let m = 0; m < 3; m++) {
+  // Check TBD/requested entries from nearby months (current + next 3 months)
+  for (let m = 0; m < 4; m++) {
     let checkMonth = month + m;
     let checkYear = year;
     if (checkMonth > 11) {
       checkMonth -= 12;
       checkYear++;
     }
-    const allEntries = [
+    const tbdEntries = [
       ...generateTbdEntries(checkYear, checkMonth),
       ...manualEntries.filter((e) => {
         const d = new Date(e.date);
-        return d.getFullYear() === checkYear && d.getMonth() === checkMonth;
+        return (
+          d.getFullYear() === checkYear &&
+          d.getMonth() === checkMonth &&
+          (e.status === "tbd" || e.status === "requested")
+        );
       }),
     ];
-    for (const entry of allEntries) {
-      if (entry.status === "tbd" && isExpired(entry)) continue;
-      if (entry.status === "done") continue;
-      // Decision reminder goes on the day before the shift
-      const reminderDate = new Date(entry.date);
-      reminderDate.setDate(reminderDate.getDate() - 1);
+    for (const entry of tbdEntries) {
+      if (isExpired(entry)) continue;
+      const weeks = NOTICE_WEEKS[entry.location];
+      if (!weeks) continue;
+      // Yellow marker goes on the notice deadline (2 or 3 weeks before)
+      const deadlineDate = new Date(entry.date);
+      deadlineDate.setDate(deadlineDate.getDate() - weeks * 7);
       if (
-        reminderDate.getFullYear() === year &&
-        reminderDate.getMonth() === month
+        deadlineDate.getFullYear() === year &&
+        deadlineDate.getMonth() === month
       ) {
-        // Hide if the shift itself has passed
-        if (new Date() > new Date(entry.date)) continue;
-        const day = reminderDate.getDate();
+        if (new Date() > deadlineDate) continue;
+        const day = deadlineDate.getDate();
         if (!markers[day]) markers[day] = [];
         const entryDate = new Date(entry.date);
         markers[day].push({
@@ -274,7 +278,7 @@ function render(): void {
     if (deadlines) {
       inner += `<span class="deadline-dot">⏰</span>`;
       const lines = deadlines
-        .map((dl) => `מחר: ${dl.forDate} ${dl.location}`)
+        .map((dl) => `לשלוח למירב: ${dl.forDate} ${dl.location}`)
         .join("<br>");
       if (!entry) {
         inner += `<div class="tooltip">${lines}</div>`;

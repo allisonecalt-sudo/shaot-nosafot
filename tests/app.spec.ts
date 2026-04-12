@@ -78,7 +78,7 @@ test("deadline markers show on decision dates", async ({ page }) => {
   expect(deadlineCount).toBeGreaterThan(0);
   // Their tooltip should say what to decide about
   const tooltip = deadlineDays.first().locator(".tooltip");
-  await expect(tooltip).toContainText("מחר:");
+  await expect(tooltip).toContainText("לשלוח למירב:");
 });
 
 test("auto-generated TBD entries are replaced by manual entries", async ({
