@@ -144,6 +144,17 @@ body {
   color: #fff;
 }
 
+.day .deadline-dot {
+  font-size: 0.55rem;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+}
+.day.has-deadline {
+  background: #fff9c4;
+  border: 1px dashed #f9a825;
+}
+
 .day .tooltip {
   display: none;
   position: absolute;

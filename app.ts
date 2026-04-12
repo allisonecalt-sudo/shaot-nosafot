@@ -8,6 +8,11 @@ interface HoursEntry {
   hours: number;
 }
 
+interface DeadlineMarker {
+  forDate: string;
+  location: string;
+}
+
 // Notice rules: how many weeks before the date you need to decide
 const NOTICE_WEEKS: Record<string, number> = {
   תלפיות: 3,
@@ -139,6 +144,52 @@ function isExpired(entry: HoursEntry): boolean {
   return new Date() > deadline;
 }
 
+function getDeadlineMarkers(
+  year: number,
+  month: number,
+): Record<number, DeadlineMarker[]> {
+  const markers: Record<number, DeadlineMarker[]> = {};
+  // Check TBD entries from nearby months (current + next 2 months)
+  for (let m = 0; m < 3; m++) {
+    let checkMonth = month + m;
+    let checkYear = year;
+    if (checkMonth > 11) {
+      checkMonth -= 12;
+      checkYear++;
+    }
+    const tbdEntries = [
+      ...generateTbdEntries(checkYear, checkMonth),
+      ...manualEntries.filter((e) => {
+        const d = new Date(e.date);
+        return (
+          d.getFullYear() === checkYear &&
+          d.getMonth() === checkMonth &&
+          (e.status === "tbd" || e.status === "requested")
+        );
+      }),
+    ];
+    for (const entry of tbdEntries) {
+      if (isExpired(entry)) continue;
+      const weeks = NOTICE_WEEKS[entry.location];
+      if (!weeks) continue;
+      const deadline = new Date(entry.date);
+      deadline.setDate(deadline.getDate() - weeks * 7);
+      if (deadline.getFullYear() === year && deadline.getMonth() === month) {
+        // Skip if deadline date has already passed
+        if (new Date() > deadline) continue;
+        const day = deadline.getDate();
+        if (!markers[day]) markers[day] = [];
+        const entryDate = new Date(entry.date);
+        markers[day].push({
+          forDate: `${entryDate.getDate()}/${entryDate.getMonth() + 1}`,
+          location: entry.location,
+        });
+      }
+    }
+  }
+  return markers;
+}
+
 function getEntries(year: number, month: number): HoursEntry[] {
   const manual = manualEntries.filter((e) => {
     const d = new Date(e.date);
@@ -200,8 +251,11 @@ function render(): void {
     html += '<div class="day empty"></div>';
   }
 
+  const deadlineMarkers = getDeadlineMarkers(currentYear, currentMonth);
+
   for (let d = 1; d <= daysInMonth; d++) {
     const entry = entryMap[d];
+    const deadlines = deadlineMarkers[d];
     const isToday =
       today.getFullYear() === currentYear &&
       today.getMonth() === currentMonth &&
@@ -209,6 +263,7 @@ function render(): void {
     let cls = "day";
     if (isToday) cls += " today";
     if (entry) cls += ` status-${entry.status}`;
+    if (deadlines && !entry) cls += " has-deadline";
 
     let inner = `<span class="num">${d}</span>`;
     if (entry) {
@@ -216,6 +271,15 @@ function render(): void {
       const decideBy = getDecideByDate(entry);
       const deadlineText = decideBy ? `<br>להחליט עד ${decideBy}` : "";
       inner += `<div class="tooltip">${entry.time} · ${entry.location}${deadlineText}</div>`;
+    }
+    if (deadlines) {
+      inner += `<span class="deadline-dot">⏰</span>`;
+      const lines = deadlines
+        .map((dl) => `להחליט על ${dl.forDate} ${dl.location}`)
+        .join("<br>");
+      if (!entry) {
+        inner += `<div class="tooltip">${lines}</div>`;
+      }
     }
     html += `<div class="${cls}">${inner}</div>`;
   }

@@ -67,6 +67,20 @@ test("today (April 12) has the today class", async ({ page }) => {
   await expect(todayCell.locator(".num")).toHaveText("12");
 });
 
+test("deadline markers show on decision dates", async ({ page }) => {
+  // Deadline markers (⏰) should exist somewhere in the calendar
+  const deadlineDots = page.locator(".deadline-dot");
+  const count = await deadlineDots.count();
+  expect(count).toBeGreaterThan(0);
+  // Days with only deadline markers (no hours entry) get a yellow background
+  const deadlineDays = page.locator(".day.has-deadline");
+  const deadlineCount = await deadlineDays.count();
+  expect(deadlineCount).toBeGreaterThan(0);
+  // Their tooltip should say what to decide about
+  const tooltip = deadlineDays.first().locator(".tooltip");
+  await expect(tooltip).toContainText("להחליט על");
+});
+
 test("auto-generated TBD entries are replaced by manual entries", async ({
   page,
 }) => {
