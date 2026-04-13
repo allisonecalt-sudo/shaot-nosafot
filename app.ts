@@ -126,12 +126,20 @@ const statusLabels: Record<EntryStatus, string> = {
 let currentYear = 2026;
 let currentMonth = 3; // April (0-indexed)
 
+function isPast(entry: HoursEntry): boolean {
+  if (entry.status !== "tbd") return false;
+  const d = new Date(entry.date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return d < today;
+}
+
 function getEntries(year: number, month: number): HoursEntry[] {
   const manual = manualEntries.filter((e) => {
     const d = new Date(e.date);
     return d.getFullYear() === year && d.getMonth() === month;
   });
-  const generated = generateTbdEntries(year, month);
+  const generated = generateTbdEntries(year, month).filter((e) => !isPast(e));
   return [...manual, ...generated];
 }
 
