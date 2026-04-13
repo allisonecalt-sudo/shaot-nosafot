@@ -8,15 +8,15 @@ interface HoursEntry {
   hours: number;
 }
 
-// Notice period labels per location
-const NOTICE_LABELS: Record<string, string> = {
-  תלפיות: "3 שבועות מראש",
-  "נווה יעקב (אבישג)": "2 שבועות מראש",
+// Notice period per location (days + label)
+const NOTICE_INFO: Record<string, { days: number; label: string }> = {
+  תלפיות: { days: 21, label: "3 שבועות מראש" },
+  "נווה יעקב (אבישג)": { days: 14, label: "2 שבועות מראש" },
 };
 
 function getNoticeLabel(entry: HoursEntry): string | null {
   if (entry.status !== "tbd") return null;
-  return NOTICE_LABELS[entry.location] || null;
+  return NOTICE_INFO[entry.location]?.label || null;
 }
 
 // Recurring TBD slots — auto-generated for every Monday and Friday
@@ -126,12 +126,13 @@ const statusLabels: Record<EntryStatus, string> = {
 let currentYear = 2026;
 let currentMonth = 3; // April (0-indexed)
 
-function isPast(entry: HoursEntry): boolean {
+function isExpired(entry: HoursEntry): boolean {
   if (entry.status !== "tbd") return false;
-  const d = new Date(entry.date);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return d < today;
+  const info = NOTICE_INFO[entry.location];
+  if (!info) return false;
+  const deadline = new Date(entry.date);
+  deadline.setDate(deadline.getDate() - info.days);
+  return new Date() > deadline;
 }
 
 function getEntries(year: number, month: number): HoursEntry[] {
@@ -139,7 +140,9 @@ function getEntries(year: number, month: number): HoursEntry[] {
     const d = new Date(e.date);
     return d.getFullYear() === year && d.getMonth() === month;
   });
-  const generated = generateTbdEntries(year, month).filter((e) => !isPast(e));
+  const generated = generateTbdEntries(year, month).filter(
+    (e) => !isExpired(e),
+  );
   return [...manual, ...generated];
 }
 
@@ -206,6 +209,7 @@ function render(): void {
     let inner = `<span class="num">${d}</span>`;
     if (entry) {
       inner += `<span class="hours-badge">${entry.hours} שע׳</span>`;
+      inner += `<span class="cal-status ${entry.status}">${statusLabels[entry.status]}</span>`;
       const notice = getNoticeLabel(entry);
       const noticeText = notice ? `<br>${notice}` : "";
       inner += `<div class="tooltip">${entry.time} · ${entry.location}${noticeText}</div>`;

@@ -144,15 +144,28 @@ body {
   color: #fff;
 }
 
-.day .deadline-dot {
-  font-size: 0.55rem;
-  position: absolute;
-  top: 2px;
-  left: 2px;
+.day .cal-status {
+  font-size: 0.5rem;
+  font-weight: 600;
+  padding: 0 3px;
+  border-radius: 4px;
+  margin-top: 1px;
 }
-.day.has-deadline {
-  background: #fff9c4;
-  border: 1px dashed #f9a825;
+.cal-status.done {
+  background: #2e7d32;
+  color: #fff;
+}
+.cal-status.confirmed {
+  background: #1565c0;
+  color: #fff;
+}
+.cal-status.requested {
+  background: #e65100;
+  color: #fff;
+}
+.cal-status.tbd {
+  background: #ad1457;
+  color: #fff;
 }
 
 .day .tooltip {
