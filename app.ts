@@ -132,6 +132,8 @@ function isExpired(entry: HoursEntry): boolean {
   if (!info) return false;
   const deadline = new Date(entry.date);
   deadline.setDate(deadline.getDate() - info.days);
+  // Keep visible through the entire deadline day
+  deadline.setHours(23, 59, 59, 999);
   return new Date() > deadline;
 }
 
