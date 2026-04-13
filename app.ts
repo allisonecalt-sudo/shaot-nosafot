@@ -8,25 +8,15 @@ interface HoursEntry {
   hours: number;
 }
 
-interface DeadlineMarker {
-  forDate: string;
-  location: string;
-}
-
-// Notice rules: how many weeks before the date you need to decide
-// Notice period in days: Talpiot (Merav) = 15 days, Neve Yaakov (Avishag) = 22 days
-const NOTICE_DAYS: Record<string, number> = {
-  תלפיות: 15, // 2 weeks + 1 day
-  "נווה יעקב (אבישג)": 22, // 3 weeks + 1 day
+// Notice period labels per location
+const NOTICE_LABELS: Record<string, string> = {
+  תלפיות: "3 שבועות מראש",
+  "נווה יעקב (אבישג)": "2 שבועות מראש",
 };
 
-function getDecideByDate(entry: HoursEntry): string | null {
-  const days = NOTICE_DAYS[entry.location];
-  if (!days) return null;
+function getNoticeLabel(entry: HoursEntry): string | null {
   if (entry.status !== "tbd") return null;
-  const d = new Date(entry.date);
-  d.setDate(d.getDate() - days);
-  return `${d.getDate()}/${d.getMonth() + 1}`;
+  return NOTICE_LABELS[entry.location] || null;
 }
 
 // Recurring TBD slots — auto-generated for every Monday and Friday
@@ -136,75 +126,12 @@ const statusLabels: Record<EntryStatus, string> = {
 let currentYear = 2026;
 let currentMonth = 3; // April (0-indexed)
 
-function isExpired(entry: HoursEntry): boolean {
-  if (entry.status !== "tbd") return false;
-  const days = NOTICE_DAYS[entry.location];
-  if (!days) return false;
-  const deadline = new Date(entry.date);
-  deadline.setDate(deadline.getDate() - days);
-  return new Date() > deadline;
-}
-
-function getDeadlineMarkers(
-  year: number,
-  month: number,
-): Record<number, DeadlineMarker[]> {
-  const markers: Record<number, DeadlineMarker[]> = {};
-  // Check TBD/requested entries from nearby months (current + next 3 months)
-  for (let m = 0; m < 4; m++) {
-    let checkMonth = month + m;
-    let checkYear = year;
-    if (checkMonth > 11) {
-      checkMonth -= 12;
-      checkYear++;
-    }
-    const tbdEntries = [
-      ...generateTbdEntries(checkYear, checkMonth),
-      ...manualEntries.filter((e) => {
-        const d = new Date(e.date);
-        return (
-          d.getFullYear() === checkYear &&
-          d.getMonth() === checkMonth &&
-          e.status === "tbd"
-        );
-      }),
-    ];
-    for (const entry of tbdEntries) {
-      if (isExpired(entry)) continue;
-      const days = NOTICE_DAYS[entry.location];
-      if (!days) continue;
-      // Yellow marker on notice deadline (15 or 22 days before)
-      const deadlineDate = new Date(entry.date);
-      deadlineDate.setDate(deadlineDate.getDate() - days);
-      if (
-        deadlineDate.getFullYear() === year &&
-        deadlineDate.getMonth() === month
-      ) {
-        // Hide only after the day is completely over (next day)
-        const endOfDay = new Date(deadlineDate);
-        endOfDay.setDate(endOfDay.getDate() + 1);
-        if (new Date() > endOfDay) continue;
-        const day = deadlineDate.getDate();
-        if (!markers[day]) markers[day] = [];
-        const entryDate = new Date(entry.date);
-        markers[day].push({
-          forDate: `${entryDate.getDate()}/${entryDate.getMonth() + 1}`,
-          location: entry.location,
-        });
-      }
-    }
-  }
-  return markers;
-}
-
 function getEntries(year: number, month: number): HoursEntry[] {
   const manual = manualEntries.filter((e) => {
     const d = new Date(e.date);
     return d.getFullYear() === year && d.getMonth() === month;
   });
-  const generated = generateTbdEntries(year, month).filter(
-    (e) => !isExpired(e),
-  );
+  const generated = generateTbdEntries(year, month);
   return [...manual, ...generated];
 }
 
@@ -258,11 +185,8 @@ function render(): void {
     html += '<div class="day empty"></div>';
   }
 
-  const deadlineMarkers = getDeadlineMarkers(currentYear, currentMonth);
-
   for (let d = 1; d <= daysInMonth; d++) {
     const entry = entryMap[d];
-    const deadlines = deadlineMarkers[d];
     const isToday =
       today.getFullYear() === currentYear &&
       today.getMonth() === currentMonth &&
@@ -270,23 +194,13 @@ function render(): void {
     let cls = "day";
     if (isToday) cls += " today";
     if (entry) cls += ` status-${entry.status}`;
-    if (deadlines && !entry) cls += " has-deadline";
 
     let inner = `<span class="num">${d}</span>`;
     if (entry) {
       inner += `<span class="hours-badge">${entry.hours} שע׳</span>`;
-      const decideBy = getDecideByDate(entry);
-      const deadlineText = decideBy ? `<br>להחליט עד ${decideBy}` : "";
-      inner += `<div class="tooltip">${entry.time} · ${entry.location}${deadlineText}</div>`;
-    }
-    if (deadlines) {
-      inner += `<span class="deadline-dot">⏰</span>`;
-      const lines = deadlines
-        .map((dl) => `לשלוח למירב: ${dl.forDate} ${dl.location}`)
-        .join("<br>");
-      if (!entry) {
-        inner += `<div class="tooltip">${lines}</div>`;
-      }
+      const notice = getNoticeLabel(entry);
+      const noticeText = notice ? `<br>${notice}` : "";
+      inner += `<div class="tooltip">${entry.time} · ${entry.location}${noticeText}</div>`;
     }
     html += `<div class="${cls}">${inner}</div>`;
   }
@@ -302,16 +216,16 @@ function render(): void {
       .forEach((e) => {
         const d = new Date(e.date);
         const dayStr = `${d.getDate()}/${d.getMonth() + 1}`;
-        const decideBy = getDecideByDate(e);
-        const deadlineLine = decideBy
-          ? `<div class="location">להחליט עד ${decideBy}</div>`
+        const notice = getNoticeLabel(e);
+        const noticeLine = notice
+          ? `<div class="location">${notice}</div>`
           : "";
         detailsHtml += `
         <div class="detail-card">
           <div class="info">
             <div>${dayStr} · ${e.time}</div>
             <div class="location">${e.location} · ${e.hours} שעות</div>
-            ${deadlineLine}
+            ${noticeLine}
           </div>
           <span class="status-tag ${e.status}">${statusLabels[e.status]}</span>
         </div>`;

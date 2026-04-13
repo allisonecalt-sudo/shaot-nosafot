@@ -44,13 +44,13 @@ test("May shows TBD entries for Neve Yaakov Mondays", async ({ page }) => {
   expect(count).toBeGreaterThanOrEqual(4);
 });
 
-test("hovering a TBD entry shows tooltip with deadline text", async ({
+test("hovering a TBD entry shows tooltip with notice period", async ({
   page,
 }) => {
   await page.click("#next");
   const tbdCell = page.locator(".day.status-tbd").first();
   const tooltip = tbdCell.locator(".tooltip");
-  await expect(tooltip).toContainText("להחליט עד");
+  await expect(tooltip).toContainText("שבועות מראש");
 });
 
 test("detail cards show below calendar", async ({ page }) => {
@@ -61,24 +61,20 @@ test("detail cards show below calendar", async ({ page }) => {
   expect(count).toBeGreaterThanOrEqual(4);
 });
 
-test("today (April 12) has the today class", async ({ page }) => {
+test("today has the today class", async ({ page }) => {
   const todayCell = page.locator(".day.today");
   await expect(todayCell).toHaveCount(1);
-  await expect(todayCell.locator(".num")).toHaveText("12");
+  const today = new Date().getDate().toString();
+  await expect(todayCell.locator(".num")).toHaveText(today);
 });
 
-test("deadline markers show on decision dates", async ({ page }) => {
-  // Deadline markers (⏰) should exist somewhere in the calendar
-  const deadlineDots = page.locator(".deadline-dot");
-  const count = await deadlineDots.count();
+test("TBD entries show notice period in tooltip", async ({ page }) => {
+  await page.click("#next");
+  const tbdCells = page.locator(".day.status-tbd");
+  const count = await tbdCells.count();
   expect(count).toBeGreaterThan(0);
-  // Days with only deadline markers (no hours entry) get a yellow background
-  const deadlineDays = page.locator(".day.has-deadline");
-  const deadlineCount = await deadlineDays.count();
-  expect(deadlineCount).toBeGreaterThan(0);
-  // Their tooltip should say what to decide about
-  const tooltip = deadlineDays.first().locator(".tooltip");
-  await expect(tooltip).toContainText("לשלוח למירב:");
+  const tooltip = tbdCells.first().locator(".tooltip");
+  await expect(tooltip).toContainText("שבועות מראש");
 });
 
 test("auto-generated TBD entries are replaced by manual entries", async ({
