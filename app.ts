@@ -1,4 +1,4 @@
-type EntryStatus = "done" | "confirmed" | "requested" | "tbd";
+type EntryStatus = "done" | "confirmed" | "requested" | "send" | "tbd";
 
 interface HoursEntry {
   date: string;
@@ -95,7 +95,7 @@ const manualEntries: HoursEntry[] = [
     date: "2026-04-27",
     time: "—",
     location: "תלפיות",
-    status: "tbd",
+    status: "send",
     hours: 4,
   },
 
@@ -135,6 +135,7 @@ const statusLabels: Record<EntryStatus, string> = {
   done: "בוצע",
   confirmed: "מאושר",
   requested: "נשלח",
+  send: "לשלוח",
   tbd: "TBD",
 };
 
@@ -179,13 +180,18 @@ function render(): void {
     done: 0,
     confirmed: 0,
     requested: 0,
+    send: 0,
     tbd: 0,
   };
   monthEntries.forEach((e) => {
     totals[e.status] = (totals[e.status] || 0) + e.hours;
   });
   const totalAll =
-    totals.done + totals.confirmed + totals.requested + totals.tbd;
+    totals.done +
+    totals.confirmed +
+    totals.requested +
+    totals.send +
+    totals.tbd;
 
   let totalsHtml = "";
   if (totals.done)
@@ -194,6 +200,8 @@ function render(): void {
     totalsHtml += `<span class="chip confirmed">מאושר: ${totals.confirmed} שע׳</span>`;
   if (totals.requested)
     totalsHtml += `<span class="chip requested">נשלח: ${totals.requested} שע׳</span>`;
+  if (totals.send)
+    totalsHtml += `<span class="chip send">לשלוח: ${totals.send} שע׳</span>`;
   if (totals.tbd)
     totalsHtml += `<span class="chip total">TBD: ${totals.tbd} שע׳</span>`;
   if (totalAll)

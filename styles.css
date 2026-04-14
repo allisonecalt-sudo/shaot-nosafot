@@ -70,6 +70,10 @@ body {
   background: #fff3e0;
   color: #e65100;
 }
+.chip.send {
+  background: #fff8e1;
+  color: #f57f17;
+}
 .chip.total {
   background: #f3e5f5;
   color: #6a1b9a;
@@ -136,6 +140,13 @@ body {
   background: #e65100;
   color: #fff;
 }
+.day.status-send {
+  background: #fff8e1;
+}
+.day.status-send .hours-badge {
+  background: #f57f17;
+  color: #fff;
+}
 .day.status-tbd {
   background: #fce4ec;
 }
@@ -161,6 +172,10 @@ body {
 }
 .cal-status.requested {
   background: #e65100;
+  color: #fff;
+}
+.cal-status.send {
+  background: #f57f17;
   color: #fff;
 }
 .cal-status.tbd {
@@ -214,6 +229,9 @@ body {
 .legend-dot.requested {
   background: #e65100;
 }
+.legend-dot.send {
+  background: #f57f17;
+}
 .legend-dot.tbd {
   background: #ad1457;
 }
@@ -259,6 +277,10 @@ body {
 .status-tag.requested {
   background: #fff3e0;
   color: #e65100;
+}
+.status-tag.send {
+  background: #fff8e1;
+  color: #f57f17;
 }
 .status-tag.tbd {
   background: #fce4ec;
