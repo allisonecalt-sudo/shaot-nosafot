@@ -84,6 +84,14 @@ const manualEntries: HoursEntry[] = [
     hours: 2,
   },
 
+  {
+    date: "2026-04-27",
+    time: "—",
+    location: "תלפיות",
+    status: "requested",
+    hours: 4,
+  },
+
   // May 2026
   {
     date: "2026-05-01",
