@@ -16,7 +16,12 @@ const NOTICE_INFO: Record<string, { days: number; label: string }> = {
 
 function getNoticeLabel(entry: HoursEntry): string | null {
   if (entry.status !== "tbd") return null;
-  return NOTICE_INFO[entry.location]?.label || null;
+  const info = NOTICE_INFO[entry.location];
+  if (!info) return null;
+  const deadline = new Date(entry.date);
+  deadline.setDate(deadline.getDate() - info.days);
+  const deadlineStr = `${deadline.getDate()}/${deadline.getMonth() + 1}`;
+  return `להחליט עד ${deadlineStr}`;
 }
 
 // Recurring TBD slots — auto-generated for every Monday and Friday

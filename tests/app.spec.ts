@@ -50,7 +50,7 @@ test("hovering a TBD entry shows tooltip with notice period", async ({
   await page.click("#next");
   const tbdCell = page.locator(".day.status-tbd").first();
   const tooltip = tbdCell.locator(".tooltip");
-  await expect(tooltip).toContainText("שבועות מראש");
+  await expect(tooltip).toContainText("להחליט עד");
 });
 
 test("detail cards show below calendar", async ({ page }) => {
@@ -74,7 +74,7 @@ test("TBD entries show notice period in tooltip", async ({ page }) => {
   const count = await tbdCells.count();
   expect(count).toBeGreaterThan(0);
   const tooltip = tbdCells.first().locator(".tooltip");
-  await expect(tooltip).toContainText("שבועות מראש");
+  await expect(tooltip).toContainText("להחליט עד");
 });
 
 test("auto-generated TBD entries are replaced by manual entries", async ({
