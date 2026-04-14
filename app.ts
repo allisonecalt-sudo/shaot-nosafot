@@ -6,6 +6,7 @@ interface HoursEntry {
   location: string;
   status: EntryStatus;
   hours: number;
+  generated?: boolean;
 }
 
 // Notice period per location (days + label)
@@ -15,7 +16,7 @@ const NOTICE_INFO: Record<string, { days: number; label: string }> = {
 };
 
 function getNoticeLabel(entry: HoursEntry): string | null {
-  if (entry.status !== "tbd") return null;
+  if (entry.status !== "tbd" || !entry.generated) return null;
   const info = NOTICE_INFO[entry.location];
   if (!info) return null;
   const deadline = new Date(entry.date);
@@ -52,6 +53,7 @@ function generateTbdEntries(year: number, month: number): HoursEntry[] {
       location: slot.location,
       status: "tbd",
       hours: slot.hours,
+      generated: true,
     });
   }
   return generated;
