@@ -66,7 +66,7 @@ const manualEntries: HoursEntry[] = [
     date: "2026-04-13",
     time: "3:30pm",
     location: "תלפיות",
-    status: "confirmed",
+    status: "done",
     hours: 2,
   },
   {

@@ -26,8 +26,8 @@ test("shows manual entries plus auto-generated TBD entries for April", async ({
 
 test("chips show correct totals for manual entries", async ({ page }) => {
   const totals = page.locator("#totals");
-  await expect(totals).toContainText("בוצע: 4 שע׳");
-  await expect(totals).toContainText("מאושר: 8 שע׳");
+  await expect(totals).toContainText("בוצע: 6 שע׳");
+  await expect(totals).toContainText("מאושר: 6 שע׳");
 });
 
 test("can navigate to May with arrow button", async ({ page }) => {
