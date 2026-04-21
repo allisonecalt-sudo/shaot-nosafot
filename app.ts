@@ -32,7 +32,6 @@ const RECURRING_SLOTS: {
   location: string;
   hours: number;
 }[] = [
-  { dayOfWeek: 1, time: "3:15-7:15", location: "נווה יעקב (אבישג)", hours: 4 }, // Monday
   { dayOfWeek: 5, time: "8:00-12:00", location: "תלפיות", hours: 4 }, // Friday
 ];
 
@@ -65,7 +64,7 @@ const manualEntries: HoursEntry[] = [
   {
     date: "2026-04-10",
     time: "—",
-    location: "תלפיות",
+    location: "נווה יעקב (אבישג)",
     status: "done",
     hours: 4,
   },
@@ -82,6 +81,13 @@ const manualEntries: HoursEntry[] = [
     location: "תלפיות",
     status: "confirmed",
     hours: 4,
+  },
+  {
+    date: "2026-04-23",
+    time: "10:00, 12:00, 14:00",
+    location: "נווה יעקב (אבישג)",
+    status: "confirmed",
+    hours: 6,
   },
   {
     date: "2026-04-23",
@@ -104,14 +110,14 @@ const manualEntries: HoursEntry[] = [
     date: "2026-05-01",
     time: "8:00-12:00",
     location: "תלפיות",
-    status: "requested",
+    status: "confirmed",
     hours: 4,
   },
   {
     date: "2026-05-08",
     time: "8:00-12:00",
     location: "תלפיות",
-    status: "requested",
+    status: "confirmed",
     hours: 4,
   },
 ];

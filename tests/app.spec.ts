@@ -27,7 +27,7 @@ test("shows manual entries plus auto-generated TBD entries for April", async ({
 test("chips show correct totals for manual entries", async ({ page }) => {
   const totals = page.locator("#totals");
   await expect(totals).toContainText("בוצע: 6 שע׳");
-  await expect(totals).toContainText("מאושר: 6 שע׳");
+  await expect(totals).toContainText("מאושר: 12 שע׳");
 });
 
 test("can navigate to May with arrow button", async ({ page }) => {
@@ -36,12 +36,12 @@ test("can navigate to May with arrow button", async ({ page }) => {
   await expect(label).toHaveText("מאי 2026");
 });
 
-test("May shows TBD entries for Neve Yaakov Mondays", async ({ page }) => {
+test("May shows TBD entries for Fridays", async ({ page }) => {
   await page.click("#next");
   const tbdCells = page.locator(".day.status-tbd");
   const count = await tbdCells.count();
-  // At least 4 Mondays in May, plus Fridays without manual entries
-  expect(count).toBeGreaterThanOrEqual(4);
+  // Fridays without manual entries (May 1 and 8 are manual, so remaining Fridays)
+  expect(count).toBeGreaterThanOrEqual(2);
 });
 
 test("hovering a TBD entry shows tooltip with notice period", async ({
